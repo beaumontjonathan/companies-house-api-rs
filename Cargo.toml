@@ -1,0 +1,11 @@
+[package]
+name = "companies-house-api"
+version = "0.0.0"
+edition = "2021"
+license = "MIT"
+description = "Rust library for consuming various APIs from Companies House"
+repository = "https://github.com/beaumontjonathan/companies-house-api-rs"
+readme = "README.md"
+authors = ["Jonathan Beaumont <hello@jonny.dev>"]
+
+[dependencies]
