@@ -6,6 +6,10 @@ Aims to be a complete and up-to-date wrapper for the [Companies House API](https
 
 Read only access to search and retrieve public company data. [Reference docs](https://developer-specs.company-information.service.gov.uk/companies-house-public-data-api/reference).
 
+### Examples
+
+See [`examples/simple.rs`](./examples/simple.rs) for an example of interacting with the client.
+
 ### Operations
 
 Currently under implementation.

@@ -118,7 +118,7 @@ dependencies = [
 
 [[package]]
 name = "companies-house-api"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "anyhow",
  "dotenvy",
