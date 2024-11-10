@@ -88,7 +88,7 @@ pub struct CompanyProfileAccountsAccountingReferenceDate {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CompanyProfileAccountsLastAccounts {
     /// Deprecated. Please use `period_end_on`.
-    made_up_to: Date,
+    made_up_to: Option<Date>,
     /// The last day of the most recently filed accounting period.
     period_end_on: Option<Date>,
     /// The first day of the most recently filed accounting period.
