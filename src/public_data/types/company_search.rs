@@ -4,19 +4,14 @@ type Date = String;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CompanySearch {
+    /// The results of the completed search.
+    items: Vec<CompanySearchItem>,
     /// The number of search items returned per page.
     items_per_page: Option<usize>,
     /// The index into the entire result set that this result page starts.
     start_index: Option<usize>,
     /// The number of further search results available for the current search.
     total_results: Option<usize>,
-    /// The results of the completed search.
-    items: Vec<CompanySearchItem>,
-    matches: Option<CompanySearchItemMatches>,
-    /// Summary information for the result showing additional details that have matched.
-    snippet: Option<String>,
-    /// The title of the search result.
-    title: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -36,6 +31,11 @@ pub struct CompanySearchItem {
     description: Option<String>,
     /// An array of enumeration types that make up the search description.
     description_identifier: Option<Vec<Option<CompanySearchItemDescriptionIdentifier>>>,
+    matches: Option<CompanySearchItemMatches>,
+    /// Summary information for the result showing additional details that have matched.
+    snippet: Option<String>,
+    /// The title of the search result.
+    title: String,
 }
 
 /// The address of the company's registered office.
