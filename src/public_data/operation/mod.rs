@@ -1,6 +1,7 @@
 pub mod get_company_profile;
 pub mod get_company_registered_office_address;
 pub mod search_companies;
+pub mod search_officers;
 
 use std::fmt::Debug;
 use thiserror::Error;

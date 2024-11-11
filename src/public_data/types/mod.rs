@@ -1,10 +1,12 @@
 mod company_profile;
 mod company_search;
+mod officer_search;
 
 use serde::{Deserialize, Serialize};
 
 pub use company_profile::*;
 pub use company_search::*;
+pub use officer_search::*;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Country {
