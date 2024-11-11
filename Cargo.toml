@@ -1,6 +1,6 @@
 [package]
 name = "companies-house-api"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 license = "MIT"
 description = "Rust library for consuming various APIs from Companies House"
