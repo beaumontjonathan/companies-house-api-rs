@@ -4,6 +4,7 @@ use companies_house_api::{
     operation::{
         get_company_profile::GetCompanyProfile,
         get_company_registered_office_address::GetCompanyRegisteredOfficeAddress,
+        search_companies::SearchCompanies,
     },
     CompaniesHousePublicDataClient,
 };
@@ -27,9 +28,15 @@ async fn main() -> anyhow::Result<()> {
     let data = client
         .send(
             GetCompanyProfile::builder()
-                .company_number("00000006")
+                .company_number("CE033707")
                 .build(),
         )
+        .await?;
+
+    println!("{data:#?}");
+
+    let data = client
+        .send(SearchCompanies::builder().query("b").build())
         .await?;
 
     println!("{data:#?}");

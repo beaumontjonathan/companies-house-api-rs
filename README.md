@@ -21,7 +21,7 @@ Currently under implementation.
 - Search
   - [ ] `GET /advanced-search/companies`: Advanced search for a company
   - [ ] `GET /search`: Search All
-  - [ ] `GET /search/companies`: Search companies
+  - [x] `GET /search/companies`: Search companies
   - [ ] `GET /search/officers`: Search company officers
   - [ ] `GET /search/disqualified-officers`: Search disqualified officers
   - [ ] `GET /alphabetical-search/companies`: Search for a company
