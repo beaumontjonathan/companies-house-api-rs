@@ -10,6 +10,7 @@ authors = ["Jonathan Beaumont <hello@jonny.dev>"]
 
 [dependencies]
 anyhow = "1.0"
+derive_more = { version = "1.0", features = ["display"] }
 reqwest = { version = "0.12", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
 serde-aux = "4.5.0"
@@ -18,5 +19,7 @@ thiserror = "2.0"
 typed-builder = "0.20"
 
 [dev-dependencies]
+minus = { version = "5.6", features = ["dynamic_output"] }
 dotenvy = "0.15"
 tokio = { version = "1.41", features = ["full"] }
+inquire = { version = "0.7.5", features = [] }
