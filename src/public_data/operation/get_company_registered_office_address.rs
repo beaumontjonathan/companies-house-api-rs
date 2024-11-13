@@ -3,7 +3,7 @@ use thiserror::Error;
 use typed_builder::TypedBuilder;
 
 use super::{CompaniesHousePublicDataOperation, CompaniesHousePublicDataOperationError};
-use crate::public_data::types;
+use crate::{public_data::types, unrecognised_response::UnrecognisedResponse};
 
 /// Get the current address of a company
 #[derive(TypedBuilder)]
@@ -22,6 +22,8 @@ pub enum GetCompanyRegisteredOfficeAddressError {
     OperationError(#[from] CompaniesHousePublicDataOperationError),
     #[error("Bad JSON")]
     SerdeJson(#[from] reqwest::Error),
+    #[error("UnrecognisedResponse {0:?}")]
+    UnrecognisedResponse(#[from] UnrecognisedResponse),
 }
 
 impl CompaniesHousePublicDataOperation for GetCompanyRegisteredOfficeAddress {
@@ -48,10 +50,15 @@ impl CompaniesHousePublicDataOperation for GetCompanyRegisteredOfficeAddress {
         match response.status() {
             StatusCode::UNAUTHORIZED => return Err(Self::Error::Unauthorized),
             StatusCode::NOT_FOUND => return Err(Self::Error::NotFound),
-            _ => {}
+            StatusCode::OK => {}
+            _ => {
+                return Err(Self::Error::UnrecognisedResponse(
+                    UnrecognisedResponse::from_response(response).await,
+                ))
+            }
         };
 
-        let value: types::RegisteredOfficeAddress = response
+        let value: Self::Data = response
             .json()
             .await
             .map_err(CompaniesHousePublicDataOperationError::Reqwest)?;

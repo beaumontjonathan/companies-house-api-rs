@@ -3,6 +3,7 @@ use thiserror::Error;
 
 pub mod operation;
 pub mod types;
+pub mod unrecognised_response;
 
 #[derive(Debug, Error)]
 pub enum CompaniesHousePublicDataClientError {

@@ -2,7 +2,7 @@ use reqwest::StatusCode;
 use thiserror::Error;
 use typed_builder::TypedBuilder;
 
-use crate::types;
+use crate::{types, unrecognised_response::UnrecognisedResponse};
 
 use super::{CompaniesHousePublicDataOperation, CompaniesHousePublicDataOperationError};
 
@@ -23,6 +23,8 @@ pub enum GetCompanyProfileError {
     OperationError(#[from] CompaniesHousePublicDataOperationError),
     #[error("Bad JSON")]
     SerdeJson(#[from] reqwest::Error),
+    #[error("UnrecognisedResponse {0:?}")]
+    UnrecognisedResponse(#[from] UnrecognisedResponse),
 }
 
 impl CompaniesHousePublicDataOperation for GetCompanyProfile {
@@ -46,10 +48,15 @@ impl CompaniesHousePublicDataOperation for GetCompanyProfile {
         match response.status() {
             StatusCode::UNAUTHORIZED => return Err(Self::Error::Unauthorized),
             StatusCode::NOT_FOUND => return Err(Self::Error::NotFound),
-            _ => {}
+            StatusCode::OK => {}
+            _ => {
+                return Err(Self::Error::UnrecognisedResponse(
+                    UnrecognisedResponse::from_response(response).await,
+                ))
+            }
         };
 
-        let value: types::CompanyProfile = response
+        let value: Self::Data = response
             .json()
             .await
             .map_err(CompaniesHousePublicDataOperationError::Reqwest)?;

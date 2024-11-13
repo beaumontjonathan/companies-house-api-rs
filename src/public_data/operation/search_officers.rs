@@ -1,9 +1,8 @@
 use reqwest::StatusCode;
-use serde_json::Value;
 use thiserror::Error;
 use typed_builder::TypedBuilder;
 
-use crate::types::OfficerSearch;
+use crate::{types::OfficerSearch, unrecognised_response::UnrecognisedResponse};
 
 use super::{CompaniesHousePublicDataOperation, CompaniesHousePublicDataOperationError};
 
@@ -29,6 +28,8 @@ pub enum SearchOfficersError {
     OperationError(#[from] CompaniesHousePublicDataOperationError),
     #[error("Bad JSON")]
     SerdeJson(#[from] reqwest::Error),
+    #[error("UnrecognisedResponse {0:?}")]
+    UnrecognisedResponse(#[from] UnrecognisedResponse),
 }
 
 impl CompaniesHousePublicDataOperation for SearchOfficers {
@@ -60,18 +61,22 @@ impl CompaniesHousePublicDataOperation for SearchOfficers {
         &self,
         response: reqwest::Response,
     ) -> Result<Self::Data, Self::Error> {
-        if response.status() == StatusCode::UNAUTHORIZED {
-            return Err(Self::Error::Unauthorized);
+        match response.status() {
+            StatusCode::UNAUTHORIZED => {
+                return Err(Self::Error::Unauthorized);
+            }
+            StatusCode::OK => {}
+            _ => {
+                return Err(Self::Error::UnrecognisedResponse(
+                    UnrecognisedResponse::from_response(response).await,
+                ))
+            }
         };
 
-        let value: Value = response
+        let value: Self::Data = response
             .json()
             .await
             .map_err(CompaniesHousePublicDataOperationError::Reqwest)?;
-
-        dbg!(&value);
-
-        let value: Self::Data = serde_json::from_value(value).unwrap();
 
         Ok(value)
     }
