@@ -47,9 +47,9 @@ pub struct OfficerSearchItemAddress {
     po_box: Option<String>,
     /// The postal code. For example CF14 3UZ.
     postal_code: Option<String>,
-    /// The region. For example Surrey.
-    premises: Option<String>,
     /// The property name or number.
+    premises: Option<String>,
+    /// The region. For example Surrey.
     region: Option<String>,
 }
 
@@ -63,7 +63,7 @@ pub struct OfficerSearchItemDateOfBirth {
 }
 
 /// An array of enumeration types that make up the search description.
-/// See search_descriptions_raw.yaml section in api-enumerations. section in [enumeration mappings](https://github.com/companieshouse/api-enumerations/blob/master/constants.yml).
+/// See `officer_search_description` section in [search descriptions](https://github.com/companieshouse/api-enumerations/blob/master/search_descriptions_raw.yaml).
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum OfficerSearchItemDescriptionIdentifiers {
