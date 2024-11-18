@@ -9,17 +9,20 @@ readme = "README.md"
 authors = ["Jonathan Beaumont <hello@jonny.dev>"]
 
 [dependencies]
-anyhow = "1.0"
 derive_more = { version = "1.0", features = ["display"] }
 reqwest = { version = "0.12", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
-serde-aux = "4.5.0"
+serde-aux = "4.5"
 serde_json = "1.0"
 thiserror = "2.0"
 typed-builder = "0.20"
+tokio = { version = "1.41", features = ["full"] }
+bytes = "1.8"
+log = { version = "0.4.22", features = ["kv"] }
 
 [dev-dependencies]
+anyhow = "1.0"
 minus = { version = "5.6", features = ["dynamic_output"] }
 dotenvy = "0.15"
-tokio = { version = "1.41", features = ["full"] }
 inquire = { version = "0.7.5", features = [] }
+env_logger = { version = "0.11.5", features = ["unstable-kv"] }
