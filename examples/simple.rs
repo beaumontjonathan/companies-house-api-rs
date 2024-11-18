@@ -49,7 +49,8 @@ fn get_page_size() -> anyhow::Result<u8> {
 async fn main() -> anyhow::Result<()> {
     dotenvy::from_filename(".env.local")?;
 
-    let client = CompaniesHousePublicDataClient::new(&env::var("COMPANIES_HOUSE_API_KEY")?)?;
+    let api_key = env::var("COMPANIES_HOUSE_API_KEY")?;
+    let client = CompaniesHousePublicDataClient::new(&api_key)?;
 
     loop {
         let operation = inquire::Select::new(

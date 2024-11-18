@@ -59,27 +59,23 @@ impl CompaniesHouseStreamingClient {
             None => log::info!("Connecting to stream without timepoint..."),
         };
 
-        let mut request =
-            reqwest::Client::new().get("https://stream.companieshouse.gov.uk/companies");
+        let mut request = reqwest::Client::new()
+            .get("https://stream.companieshouse.gov.uk/companies")
+            .basic_auth(&self.api_key, Option::<&str>::None);
 
         if let Some(timepoint) = timepoint {
             request = request.query(&[("timepoint", timepoint)]);
         }
 
-        let response = timeout(
-            self.connection_timeout,
-            request
-                .basic_auth(&self.api_key, Option::<&str>::None)
-                .send(),
-        )
-        .await
-        .map_err(|_| {
-            log::info!("Connection timeout");
-            CompaniesHouseStreamingError::ConnectionTimeout
-        })?
-        .map_err(CompaniesHouseStreamingError::UnknownConnection)?;
+        let response = timeout(self.connection_timeout, request.send())
+            .await
+            .map_err(|_| {
+                log::info!("Connection timeout");
+                CompaniesHouseStreamingError::ConnectionTimeout
+            })?
+            .map_err(CompaniesHouseStreamingError::UnknownConnection)?;
 
-        log::info!("Connection successful {}", response.status());
+        log::info!(status = response.status().as_u16(); "Connection successful");
 
         Ok(StreamConnection {
             buffer: BytesMut::new(),
@@ -106,7 +102,7 @@ impl StreamConnection {
                 if str.is_empty() {
                     log::trace!("Buffer contains empty line");
                 } else {
-                    log::trace!("Buffer contains next stream item");
+                    log::trace!(length = str.len(); "Buffer contains next stream item");
                     let value: serde_json::Value = serde_json::from_str(str)
                         .map_err(CompaniesHouseStreamingError::BadValueJson)?;
                     return Ok(value);
