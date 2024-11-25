@@ -1,22 +1,7 @@
-use companies_house_api::CompaniesHouseStreamingClient;
-use serde::Deserialize;
-use std::env;
-
-#[derive(Debug, Deserialize)]
-struct Item {
-    data: Data,
-    event: Event,
-}
-
-#[derive(Debug, Deserialize)]
-struct Data {
-    company_name: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-struct Event {
-    timepoint: usize,
-}
+use companies_house_api::streaming::{
+    operation::{companies::StreamCompanies, filings::StreamFilings},
+    CompaniesHouseStreamingClient, CompaniesHouseStreamingNextError,
+};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -24,32 +9,47 @@ async fn main() -> anyhow::Result<()> {
 
     dotenvy::from_filename(".env.local")?;
 
-    let api_key = env::var("COMPANIES_HOUSE_STREAMING_API_KEY")?;
+    let api_key = std::env::var("COMPANIES_HOUSE_STREAMING_API_KEY")?;
     let client = CompaniesHouseStreamingClient::new(&api_key);
 
-    let mut latest_timepoint = Some(87268311);
+    let mut latest_timepoint = Some(176080588);
 
     loop {
-        let Ok(mut stream) = client.stream_companies(latest_timepoint).await else {
-            continue;
+        let mut stream = match client
+            // .stream(StreamCompanies, latest_timepoint.map(|t| t + 1))
+            .stream(StreamFilings, latest_timepoint.map(|t| t + 1))
+            .await
+        {
+            Ok(stream) => stream,
+            Err(err) => {
+                log::error!("Connection failed: {err:?}");
+                continue;
+            }
         };
 
         loop {
             match stream.next().await {
+                Ok(item) => {
+                    latest_timepoint = Some(item.event.timepoint);
+                    log::info!(
+                        timepoint = item.event.timepoint;
+                        "Filing received: {:?}",
+                        item.data,
+                    );
+                }
+                Err(CompaniesHouseStreamingNextError::BadItemData { inner, value }) => {
+                    log::error!(
+                        timepoint = value.event.timepoint;
+                        "Error reading JSON data: {inner} {value:?}",
+                    );
+                    latest_timepoint = Some(value.event.timepoint);
+                }
+                Err(CompaniesHouseStreamingNextError::BadItemJson { inner, text }) => {
+                    anyhow::bail!("Bad json {inner:?} {text}")
+                }
                 Err(err) => {
                     log::error!("Stream error: {err}");
                     break;
-                }
-                Ok(item) => {
-                    let item: Item = serde_json::from_value(item)?;
-                    latest_timepoint = Some(item.event.timepoint + 1);
-                    log::info!(
-                        "{}: {}",
-                        item.event.timepoint,
-                        item.data
-                            .company_name
-                            .unwrap_or_else(|| "unknown".to_string())
-                    );
                 }
             }
         }
