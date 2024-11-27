@@ -1,6 +1,6 @@
 use companies_house_api::streaming::{
-    operation::{companies::StreamCompanies, filings::StreamFilings},
-    CompaniesHouseStreamingClient, CompaniesHouseStreamingNextError,
+    operation::companies::StreamCompanies, CompaniesHouseStreamingClient,
+    CompaniesHouseStreamingNextError,
 };
 
 #[tokio::main]
@@ -12,12 +12,11 @@ async fn main() -> anyhow::Result<()> {
     let api_key = std::env::var("COMPANIES_HOUSE_STREAMING_API_KEY")?;
     let client = CompaniesHouseStreamingClient::new(&api_key);
 
-    let mut latest_timepoint = Some(176080588);
+    let mut latest_timepoint = None;
 
     loop {
         let mut stream = match client
-            // .stream(StreamCompanies, latest_timepoint.map(|t| t + 1))
-            .stream(StreamFilings, latest_timepoint.map(|t| t + 1))
+            .stream(StreamCompanies, latest_timepoint.map(|t| t + 1))
             .await
         {
             Ok(stream) => stream,
@@ -33,7 +32,7 @@ async fn main() -> anyhow::Result<()> {
                     latest_timepoint = Some(item.event.timepoint);
                     log::info!(
                         timepoint = item.event.timepoint;
-                        "Filing received: {:?}",
+                        "Company received: {:?}",
                         item.data,
                     );
                 }
