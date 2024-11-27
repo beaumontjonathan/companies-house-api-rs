@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 use serde_aux::prelude::{deserialize_number_from_string, deserialize_option_number_from_string};
 
-use super::{shared::Date, Country};
+use super::{shared::Date, Country, OtherString};
 
 /// Company Profile
 #[derive(Debug, Serialize, Deserialize)]
@@ -61,7 +61,8 @@ pub struct CompanyProfile {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CompanyProfileAccounts {
     /// The Accounting Reference Date (ARD) of the company.
-    pub accounting_reference_date: CompanyProfileAccountsAccountingReferenceDate,
+    /// Note: Optional for FC companies
+    pub accounting_reference_date: Option<CompanyProfileAccountsAccountingReferenceDate>,
     pub last_accounts: Option<CompanyProfileAccountsLastAccounts>,
     pub next_account: Option<CompanyProfileAccountsNextAccounts>,
     /// Deprecated. Please use `accounts.next_accounts.due_on`.
@@ -93,7 +94,8 @@ pub struct CompanyProfileAccountsLastAccounts {
     /// The first day of the most recently filed accounting period.
     pub period_start_on: Option<Date>,
     /// The type of the last company accounts filed.
-    pub r#type: CompanyProfileAccountsLastAccountsType,
+    /// Note: Optional for FC companies
+    pub r#type: Option<CompanyProfileAccountsLastAccountsType>,
 }
 
 /// The type of the last company accounts filed.
@@ -194,9 +196,11 @@ pub struct CompanyProfileConfirmationStatement {
     /// The date to which the company last made a confirmation statement.
     pub last_made_up_to: Option<Date>,
     /// The date by which the next confirmation statement must be received.
-    pub next_due: Date,
+    /// Note: Only optional for overseas entities
+    pub next_due: Option<Date>,
     /// The date to which the company must next make a confirmation statement.
-    pub next_made_up_to: Date,
+    /// Note: Only optional for overseas entities
+    pub next_made_up_to: Option<Date>,
     /// Flag indicating if the confirmation statement is overdue.
     pub overdue: Option<bool>,
 }
@@ -306,6 +310,8 @@ pub struct CompanyProfileLinks {}
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum CompanyProfilePartialDataAvailable {
+    /// Note: Company starts with: NO
+    FullDataAvailableFromFinancialConductAuthorityMutualsPublicRegister,
     FullDataAvailableFromFinancialConductAuthority,
     FullDataAvailableFromDepartmentOfTheEconomy,
     FullDataAvailableFromTheCompany,
@@ -332,7 +338,7 @@ pub struct CompanyProfileRegisteredOfficeAddress {
     /// The care of name.
     pub care_of: Option<String>,
     /// The country.
-    pub country: Option<Country>,
+    pub country: Option<OtherString<Country>>,
     /// The locality e.g London.
     pub locality: Option<String>,
     /// The post-office box number.
@@ -388,6 +394,7 @@ pub enum CompanyProfileType {
     PrivateLimitedGuarantNsc,
     ConvertedOrClosed,
     PrivateUnlimitedNsc,
+    #[serde(rename = "private-limited-shares-section-30-exemption")]
     PrivateLimitedSharesSection30Exemption,
     ProtectedCellCompany,
     AssuranceCompany,
@@ -411,5 +418,6 @@ pub enum CompanyProfileType {
     CharitableIncorporatedOrganisation,
     ScottishCharitableIncorporatedOrganisation,
     FurtherEducationOrSixthFormCollegeCorporation,
+    OverseasEntity,
     RegisteredOverseasEntity,
 }

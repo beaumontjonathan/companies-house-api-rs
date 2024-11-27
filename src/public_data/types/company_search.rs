@@ -107,6 +107,7 @@ pub enum CompanyStatusItemCompanyType {
     PrivateLimitedGuarantNsc,
     ConvertedOrClosed,
     PrivateUnlimitedNsc,
+    #[serde(rename = "private-limited-shares-section-30-exemption")]
     PrivateLimitedSharesSection30Exemption,
     AssuranceCompany,
     OverseaCompany,
