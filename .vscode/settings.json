@@ -3,7 +3,8 @@
   "cSpell.words": [
     "dotenvy",
     "reqwest",
-    "thiserror"
+    "thiserror",
+    "timepoint"
   ],
   "rust-analyzer.check.command": "clippy"
 }

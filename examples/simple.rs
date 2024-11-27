@@ -1,8 +1,7 @@
-use minus::dynamic_paging;
-use std::fmt::Write;
-
 use companies_house_api::{operation, CompaniesHousePublicDataClient};
 use derive_more::derive::Display;
+use minus::dynamic_paging;
+use std::fmt::Write;
 
 #[derive(Debug, Display)]
 enum Operation {
