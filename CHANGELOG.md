@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.5](https://github.com/beaumontjonathan/companies-house-api-rs/compare/v0.0.4...v0.0.5) - 2024-11-27
+
+### Added
+
+- *(streaming-api)* support basic streaming api for companies and filings
+- *(public-data-api)* support better errors from operation requests
+
+### Fixed
+
+- *(public-data-api)* various small company profile and search data changes to support rare cases
+- *(public-data-api)* make all data struct fields public
+
+### Other
+
+- *(docs)* tweak import formatting of example script
+
 ## [0.0.4](https://github.com/beaumontjonathan/companies-house-api-rs/compare/v0.0.3...v0.0.4) - 2024-11-13
 
 ### Added
