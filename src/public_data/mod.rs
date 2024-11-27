@@ -3,7 +3,7 @@ use thiserror::Error;
 
 pub mod operation;
 pub mod types;
-pub mod unrecognised_response;
+pub mod unexpected_status;
 
 #[derive(Debug, Error)]
 pub enum CompaniesHousePublicDataClientError {
@@ -50,12 +50,24 @@ impl CompaniesHousePublicDataClient {
     pub async fn send<T: CompaniesHousePublicDataOperation>(
         &self,
         operation: T,
-    ) -> Result<T::Data, T::Error> {
+    ) -> Result<T::Data, CompaniesHousePublicDataOperationError<T::StatusError>> {
         let request = operation.build_request(&self.base_url, &self.client)?;
-        let response =
-            self.client.execute(request).await.map_err(|err| {
-                T::Error::from(CompaniesHousePublicDataOperationError::Reqwest(err))
-            })?;
-        operation.handle_response(response).await
+
+        let response = self.client.execute(request).await?;
+
+        operation
+            .handle_status(response.status())
+            .map_err(CompaniesHousePublicDataOperationError::Status)?;
+
+        let bytes = response.bytes().await?;
+
+        match serde_json::from_slice(&bytes) {
+            Ok(value) => Ok(value),
+            Err(inner) => Err(CompaniesHousePublicDataOperationError::JsonParse {
+                inner,
+                value: serde_json::from_slice(&bytes).ok(),
+                body: bytes,
+            }),
+        }
     }
 }

@@ -10,6 +10,7 @@ authors = ["Jonathan Beaumont <hello@jonny.dev>"]
 
 [dependencies]
 anyhow = "1.0"
+bytes = "1.8"
 derive_more = { version = "1.0", features = ["display"] }
 reqwest = { version = "0.12", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }

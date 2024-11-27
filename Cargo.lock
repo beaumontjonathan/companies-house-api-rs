@@ -133,6 +133,7 @@ name = "companies-house-api"
 version = "0.0.4"
 dependencies = [
  "anyhow",
+ "bytes",
  "derive_more",
  "dotenvy",
  "inquire",

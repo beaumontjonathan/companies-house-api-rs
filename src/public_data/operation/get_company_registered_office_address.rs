@@ -3,7 +3,7 @@ use thiserror::Error;
 use typed_builder::TypedBuilder;
 
 use super::{CompaniesHousePublicDataOperation, CompaniesHousePublicDataOperationError};
-use crate::{public_data::types, unrecognised_response::UnrecognisedResponse};
+use crate::{public_data::types, unexpected_status::UnexpectedStatusError};
 
 /// Get the current address of a company
 #[derive(TypedBuilder)]
@@ -13,28 +13,24 @@ pub struct GetCompanyRegisteredOfficeAddress {
 }
 
 #[derive(Debug, Error)]
-pub enum GetCompanyRegisteredOfficeAddressError {
+pub enum GetCompanyRegisteredOfficeAddressStatusError {
     #[error("Unauthorized")]
     Unauthorized,
     #[error("Not found")]
     NotFound,
-    #[error("Operation error")]
-    OperationError(#[from] CompaniesHousePublicDataOperationError),
-    #[error("Bad JSON")]
-    SerdeJson(#[from] reqwest::Error),
-    #[error("UnrecognisedResponse {0:?}")]
-    UnrecognisedResponse(#[from] UnrecognisedResponse),
+    #[error(transparent)]
+    UnexpectedStatus(#[from] UnexpectedStatusError),
 }
 
 impl CompaniesHousePublicDataOperation for GetCompanyRegisteredOfficeAddress {
-    type Error = GetCompanyRegisteredOfficeAddressError;
+    type StatusError = GetCompanyRegisteredOfficeAddressStatusError;
     type Data = types::RegisteredOfficeAddress;
 
     fn build_request(
         &self,
         base_url: &str,
         client: &reqwest::Client,
-    ) -> Result<reqwest::Request, CompaniesHousePublicDataOperationError> {
+    ) -> Result<reqwest::Request, CompaniesHousePublicDataOperationError<Self::StatusError>> {
         Ok(client
             .get(format!(
                 "{base_url}/company/{}/registered-office-address",
@@ -43,26 +39,14 @@ impl CompaniesHousePublicDataOperation for GetCompanyRegisteredOfficeAddress {
             .build()?)
     }
 
-    async fn handle_response(
-        &self,
-        response: reqwest::Response,
-    ) -> Result<Self::Data, Self::Error> {
-        match response.status() {
-            StatusCode::UNAUTHORIZED => return Err(Self::Error::Unauthorized),
-            StatusCode::NOT_FOUND => return Err(Self::Error::NotFound),
-            StatusCode::OK => {}
-            _ => {
-                return Err(Self::Error::UnrecognisedResponse(
-                    UnrecognisedResponse::from_response(response).await,
-                ))
-            }
-        };
-
-        let value: Self::Data = response
-            .json()
-            .await
-            .map_err(CompaniesHousePublicDataOperationError::Reqwest)?;
-
-        Ok(value)
+    fn handle_status(&self, status_code: StatusCode) -> Result<(), Self::StatusError> {
+        match status_code {
+            StatusCode::OK => Ok(()),
+            StatusCode::UNAUTHORIZED => Err(Self::StatusError::Unauthorized),
+            StatusCode::NOT_FOUND => Err(Self::StatusError::NotFound),
+            status_code => Err(Self::StatusError::UnexpectedStatus(UnexpectedStatusError {
+                status_code,
+            })),
+        }
     }
 }

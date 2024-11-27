@@ -2,7 +2,7 @@ use reqwest::StatusCode;
 use thiserror::Error;
 use typed_builder::TypedBuilder;
 
-use crate::{types::CompanySearch, unrecognised_response::UnrecognisedResponse};
+use crate::{types::CompanySearch, unexpected_status::UnexpectedStatusError};
 
 use super::{CompaniesHousePublicDataOperation, CompaniesHousePublicDataOperationError};
 
@@ -26,26 +26,22 @@ pub struct SearchCompanies {
 }
 
 #[derive(Debug, Error)]
-pub enum SearchCompaniesError {
+pub enum SearchCompaniesStatusError {
     #[error("Unauthorized")]
     Unauthorized,
-    #[error("Operation error")]
-    OperationError(#[from] CompaniesHousePublicDataOperationError),
-    #[error("Bad JSON")]
-    SerdeJson(#[from] reqwest::Error),
-    #[error("UnrecognisedResponse {0:?}")]
-    UnrecognisedResponse(#[from] UnrecognisedResponse),
+    #[error(transparent)]
+    UnexpectedStatus(#[from] UnexpectedStatusError),
 }
 
 impl CompaniesHousePublicDataOperation for SearchCompanies {
-    type Error = SearchCompaniesError;
+    type StatusError = SearchCompaniesStatusError;
     type Data = CompanySearch;
 
     fn build_request(
         &self,
         base_url: &str,
         client: &reqwest::Client,
-    ) -> Result<reqwest::Request, CompaniesHousePublicDataOperationError> {
+    ) -> Result<reqwest::Request, CompaniesHousePublicDataOperationError<Self::StatusError>> {
         let mut query_params = vec![("q", self.query.to_owned())];
 
         if let Some(items_per_page) = self.items_per_page {
@@ -66,25 +62,13 @@ impl CompaniesHousePublicDataOperation for SearchCompanies {
             .build()?)
     }
 
-    async fn handle_response(
-        &self,
-        response: reqwest::Response,
-    ) -> Result<Self::Data, Self::Error> {
-        match response.status() {
-            StatusCode::UNAUTHORIZED => return Err(Self::Error::Unauthorized),
-            StatusCode::OK => {}
-            _ => {
-                return Err(Self::Error::UnrecognisedResponse(
-                    UnrecognisedResponse::from_response(response).await,
-                ))
-            }
+    fn handle_status(&self, status_code: StatusCode) -> Result<(), Self::StatusError> {
+        match status_code {
+            StatusCode::OK => Ok(()),
+            StatusCode::UNAUTHORIZED => Err(Self::StatusError::Unauthorized),
+            status_code => Err(Self::StatusError::UnexpectedStatus(UnexpectedStatusError {
+                status_code,
+            })),
         }
-
-        let value: Self::Data = response
-            .json()
-            .await
-            .map_err(CompaniesHousePublicDataOperationError::Reqwest)?;
-
-        Ok(value)
     }
 }
