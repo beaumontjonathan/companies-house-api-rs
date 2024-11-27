@@ -1,9 +1,7 @@
-use minus::dynamic_paging;
-use std::env;
-use std::fmt::Write;
-
 use companies_house_api::{operation, CompaniesHousePublicDataClient};
 use derive_more::derive::Display;
+use minus::dynamic_paging;
+use std::fmt::Write;
 
 #[derive(Debug, Display)]
 enum Operation {
@@ -49,7 +47,7 @@ fn get_page_size() -> anyhow::Result<u8> {
 async fn main() -> anyhow::Result<()> {
     dotenvy::from_filename(".env.local")?;
 
-    let api_key = env::var("COMPANIES_HOUSE_API_KEY")?;
+    let api_key = std::env::var("COMPANIES_HOUSE_API_KEY")?;
     let client = CompaniesHousePublicDataClient::new(&api_key)?;
 
     loop {

@@ -1,54 +1,54 @@
 use serde::{Deserialize, Serialize};
 
-type Date = String;
+use super::shared::Date;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DisqualifiedOfficerSearch {
     /// The results of the completed search.
-    items: Option<Vec<DisqualifiedOfficerSearchItem>>,
+    pub items: Option<Vec<DisqualifiedOfficerSearchItem>>,
     /// The number of search items returned per page.
-    items_per_page: Option<usize>,
+    pub items_per_page: Option<usize>,
     /// The index into the entire result set that this result page starts.
-    start_index: Option<usize>,
+    pub start_index: Option<usize>,
     /// The number of further search results available for the current search.
-    total_results: Option<usize>,
+    pub total_results: Option<usize>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DisqualifiedOfficerSearchItem {
     /// The address of the disqualified officer as provided by the disqualifying authority.
-    address: DisqualifiedOfficerSearchItemAddress,
+    pub address: DisqualifiedOfficerSearchItemAddress,
     /// A single line address. This will be the address that matched within the indexed
     /// document or the primary address otherwise (as returned by the `address` member).
-    address_snippet: String,
+    pub address_snippet: String,
     /// The disqualified officer's date of birth.
-    date_of_birth: Option<Date>,
+    pub date_of_birth: Option<Date>,
     /// The result description.
-    description: String,
-    description_identifiers: Option<Vec<DisqualifiedOfficerSearchItemDescriptionIdentifiers>>,
-    matches: Option<DisqualifiedOfficerSearchItemMatches>,
+    pub description: String,
+    pub description_identifiers: Option<Vec<DisqualifiedOfficerSearchItemDescriptionIdentifiers>>,
+    pub matches: Option<DisqualifiedOfficerSearchItemMatches>,
     /// Summary information for the result showing additional details that have matched.
-    snippet: Option<String>,
+    pub snippet: Option<String>,
     /// The title of the search result.
-    title: String,
+    pub title: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DisqualifiedOfficerSearchItemAddress {
     /// The first line of the address.
-    address_line_1: Option<String>,
+    pub address_line_1: Option<String>,
     /// The second line of the address.
-    address_line_2: Option<String>,
+    pub address_line_2: Option<String>,
     /// The country. For example UK.
-    country: Option<String>,
+    pub country: Option<String>,
     /// The locality. For example London.
-    locality: Option<String>,
+    pub locality: Option<String>,
     /// The postal code. For example CF14 3UZ.
-    postal_code: Option<String>,
+    pub postal_code: Option<String>,
     /// The property name or number.
-    premises: Option<String>,
+    pub premises: Option<String>,
     /// The region. For example Surrey.
-    region: Option<String>,
+    pub region: Option<String>,
 }
 
 /// An array of enumeration types that make up the search description.
@@ -63,9 +63,9 @@ pub enum DisqualifiedOfficerSearchItemDescriptionIdentifiers {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DisqualifiedOfficerSearchItemMatches {
     /// An array of character offset into the `address_snippet` string. These always occur in pairs and define the start and end of substrings in the member `address_snippet` that matched the search terms.
-    address_snippet: Option<Vec<usize>>,
+    pub address_snippet: Option<Vec<usize>>,
     /// An array of character offset into the `snippet` string. These always occur in pairs and define the start and end of substrings in the member snippet that matched the search terms. The first character of the string is index 1.
-    snippet: Option<Vec<usize>>,
+    pub snippet: Option<Vec<usize>>,
     /// An array of character offset into the `title` string. These always occur in pairs and define the start and end of substrings in the member `title` that matched the search terms. The first character of the string is index 1.
-    title: Option<Vec<usize>>,
+    pub title: Option<Vec<usize>>,
 }

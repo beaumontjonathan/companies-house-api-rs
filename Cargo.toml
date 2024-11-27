@@ -1,6 +1,6 @@
 [package]
 name = "companies-house-api"
-version = "0.0.3"
+version = "0.0.4"
 edition = "2021"
 license = "MIT"
 description = "Rust library for consuming various APIs from Companies House"
@@ -9,6 +9,7 @@ readme = "README.md"
 authors = ["Jonathan Beaumont <hello@jonny.dev>"]
 
 [dependencies]
+bytes = "1.8"
 derive_more = { version = "1.0", features = ["display"] }
 reqwest = { version = "0.12", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
@@ -17,7 +18,6 @@ serde_json = "1.0"
 thiserror = "2.0"
 typed-builder = "0.20"
 tokio = { version = "1.41", features = ["full"] }
-bytes = "1.8"
 log = { version = "0.4.22", features = ["kv"] }
 
 [dev-dependencies]

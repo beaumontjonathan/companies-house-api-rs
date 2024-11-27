@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.4](https://github.com/beaumontjonathan/companies-house-api-rs/compare/v0.0.3...v0.0.4) - 2024-11-13
+
+### Added
+
+- *(public-data-api)* add new operation `SearchDisqualifiedOfficers`
+
+### Fixed
+
+- *(public-data-api)* check status codes on all responses before attempting to deserialize body
+
+### Other
+
+- *(public-data-api)* impove examples
+- *(public-data-api)* fix incorrect doc comments for `OfficerSearch`
+
 ## [0.0.3](https://github.com/beaumontjonathan/companies-house-api-rs/compare/v0.0.2...v0.0.3) - 2024-11-11
 
 ### Added
