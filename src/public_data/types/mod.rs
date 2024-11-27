@@ -2,6 +2,7 @@ mod company_profile;
 mod company_search;
 mod disqualified_officer_search;
 mod officer_search;
+mod shared;
 
 use serde::{Deserialize, Serialize};
 
@@ -9,6 +10,13 @@ pub use company_profile::*;
 pub use company_search::*;
 pub use disqualified_officer_search::*;
 pub use officer_search::*;
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum OtherString<T> {
+    Value(T),
+    Other(String),
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Country {
